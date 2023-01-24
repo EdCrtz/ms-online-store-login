@@ -1,4 +1,8 @@
-import { Injectable, NotAcceptableException } from '@nestjs/common';
+import {
+  Injectable,
+  NotAcceptableException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { UsersService } from '../users/users.service';
 import * as bcrypt from 'bcrypt';
 
@@ -23,7 +27,6 @@ export class AuthService {
       products: [],
     };
     const user = await this.usersService.getUser(userDto);
-    console.log('Entree');
     if (!user) return null;
     const passwordValid = await bcrypt.compare(password, user.password);
     if (!user) {
@@ -39,5 +42,13 @@ export class AuthService {
     return {
       access_token: this.jwtService.sign(payload),
     };
+  }
+  async validateToken(token: string) {
+    try {
+      const decoded = this.jwtService.verify(token);
+      return { user: decoded };
+    } catch (error) {
+      throw new UnauthorizedException();
+    }
   }
 }
