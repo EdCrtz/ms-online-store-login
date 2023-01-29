@@ -37,8 +37,12 @@ export class AuthService {
     }
     return null;
   }
-  async login(user: any) {
-    const payload = { username: user.name, sub: user.id };
+  async login(data: any) {
+    const payload = {
+      name: data.user.name,
+      id: data.user.id,
+      email: data.user.email,
+    };
     return {
       access_token: this.jwtService.sign(payload),
     };
@@ -48,6 +52,7 @@ export class AuthService {
       const decoded = this.jwtService.verify(token);
       return { user: decoded };
     } catch (error) {
+      console.log(error);
       throw new UnauthorizedException();
     }
   }
